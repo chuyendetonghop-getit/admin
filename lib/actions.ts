@@ -204,4 +204,44 @@ export async function getDashboardAnalytics() {
 
 // 5. Post actions
 
+// get posts from db with limit, skip, search
+export async function getPosts({
+  limit = 10,
+  skip = 1,
+  search,
+}: {
+  limit?: number;
+  skip?: number;
+  search?: string;
+}) {
+  try {
+    await connectDB();
+
+    const query = search
+      ? {
+          title: { $regex: search, $options: "i" },
+        }
+      : {};
+
+    const posts = await PostModel.find(query)
+      .sort({ createdAt: 1 })
+      .skip((skip - 1) * limit ?? 0)
+      .limit(limit ?? 10)
+      .lean();
+
+    // console.log("Posts", posts);
+
+    return {
+      success: true,
+      data: posts,
+    };
+  } catch (error: any) {
+    console.log("Error in getPosts", error);
+    return {
+      success: false,
+      message: error ?? error.message,
+    };
+  }
+}
+
 // 6. Report actions
