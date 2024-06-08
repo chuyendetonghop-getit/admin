@@ -9,6 +9,9 @@ import { SignJWT } from "jose";
 import { revalidatePath } from "next/cache";
 import PostModel from "@/models/post.model";
 import ReportModel from "@/models/report.model";
+import exp from "constants";
+import { formatDataForRecharts } from "./utils";
+import { TModelAggregateResponse } from "@/types/analytics";
 
 // 1. Auth actions
 export async function loginAction(data: FormData) {
@@ -108,6 +111,92 @@ export async function getDashboardCommonStatistics() {
       success: false,
       message: error ?? error.message,
     };
+  }
+}
+
+// ------------------------------
+
+export async function getDashboardAnalytics() {
+  try {
+    await connectDB();
+
+    const currentYear = new Date().getFullYear();
+
+    const userAggregation = UserModel.aggregate([
+      {
+        $match: {
+          createdAt: {
+            $gte: new Date(`${currentYear}-01-01`),
+            $lt: new Date(`${currentYear + 1}-01-01`),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: { $month: "$createdAt" },
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+
+    const postAggregation = PostModel.aggregate([
+      {
+        $match: {
+          createdAt: {
+            $gte: new Date(`${currentYear}-01-01`),
+            $lt: new Date(`${currentYear + 1}-01-01`),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: { $month: "$createdAt" },
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+
+    const reportAggregation = ReportModel.aggregate([
+      {
+        $match: {
+          createdAt: {
+            $gte: new Date(`${currentYear}-01-01`),
+            $lt: new Date(`${currentYear + 1}-01-01`),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: { $month: "$createdAt" },
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+
+    const [userStats, postStats, reportStats] = await Promise.all([
+      userAggregation,
+      postAggregation,
+      reportAggregation,
+    ]);
+
+    // console.log("1. userStats", userStats);
+    // console.log("2. postStats", postStats);
+    // console.log("3. reportStats", reportStats);
+
+    const finalData = formatDataForRecharts({
+      userStats,
+      postStats,
+      reportStats,
+    });
+
+    // console.log(finalData);
+
+    return finalData;
+  } catch (error: any) {
+    console.log("Error in getDashboardAnalytics", error);
   }
 }
 
