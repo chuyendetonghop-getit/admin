@@ -1,17 +1,96 @@
 "use server";
 
+import UserModel, { UserDocument } from "@/models/user.model";
+import bcrypt from "bcrypt";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import connectDB from "./db";
+import { SignJWT } from "jose";
+import { revalidatePath } from "next/cache";
+
 // 1. Auth actions
-
 export async function loginAction(data: FormData) {
-  console.log("Login action called", data.get("email"), data.get("password"));
+  const email = data.get("email");
+  const password = data.get("password");
 
-  // set cookie here
+  console.log("AC> Login action called", email, password);
+
+  if (!email || !password) {
+    console.log("Email or password is missing");
+    return {
+      success: false,
+      message: "Email or password is missing",
+    };
+  }
+
+  try {
+    await connectDB();
+
+    const user = (await UserModel.findOne({
+      email: email,
+      role: "admin",
+    }).lean()) as UserDocument;
+    console.log("user --->", user);
+
+    if (!user) {
+      return {
+        success: false,
+        message: "No admin found",
+      };
+    }
+
+    // Check authorization
+    const isMatch = await bcrypt.compare(password as string, user.password);
+
+    if (!isMatch) {
+      return {
+        success: false,
+        message: "Invalid credentials",
+      };
+    }
+
+    //   Generate JWT
+    const theSecret = process.env.THE_SECRET;
+    const iat = Math.floor(Date.now() / 1000);
+    const exp = iat + 60 * 60 * Number(process.env.ACCESS_TOKEN_TTL_NUMBER); // 4 hour
+
+    const accessToken = await new SignJWT({ ...user })
+      .setProtectedHeader({ alg: "HS256", typ: "JWT" })
+      .setExpirationTime(exp)
+      .setIssuedAt(iat)
+      .setNotBefore(iat)
+      .sign(new TextEncoder().encode(theSecret));
+
+    await cookies().set({
+      name: "accessToken",
+      value: accessToken,
+      path: "/",
+      httpOnly: true,
+      secure: true,
+      expires: new Date(
+        Date.now() +
+          1000 * 60 * 60 * Number(process.env.ACCESS_TOKEN_TTL_NUMBER)
+      ), // 4h
+    });
+  } catch (error: any) {
+    console.log("Error in loginAction", error);
+    throw new Error(error);
+  }
+  redirect("/");
 }
 
-// 2.Dashboard actions
+// ------------------------------
+export async function logoutAction() {
+  cookies().delete("accessToken");
+  console.log(" => -----------------------------");
+  // redirect("/auth");
+}
+// ------------------------------
 
-// 3. User actions
+// 3.Dashboard actions
 
-// 4. Post actions
+// 4. User actions
 
-// 5. Report actions
+// 5. Post actions
+
+// 6. Report actions

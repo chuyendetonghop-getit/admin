@@ -1,7 +1,7 @@
-import Image from "next/image";
-import Link from "next/link";
-import logo from "../img/get-it-logo.png";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+"use client";
+
+import ThemeToggler from "@/components/ThemeToggler";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,9 +10,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import ThemeToggler from "@/components/ThemeToggler";
+import { logoutAction } from "@/lib/actions";
+import Image from "next/image";
+import Link from "next/link";
+import logo from "../img/get-it-logo.png";
 
 const Navbar = () => {
+  const handleLogout = async () => {
+    await logoutAction();
+  };
   return (
     <div className="bg-primary dark:bg-slate-700 text-white py-2 px-5 flex justify-between">
       <Link href="/">
@@ -40,7 +46,9 @@ const Navbar = () => {
               <Link href="/profile">Profile</Link>
             </DropdownMenuItem>
             <DropdownMenuItem>
-              <Link href="/auth">Logout</Link>
+              <Link href="/auth" onClick={handleLogout}>
+                Logout
+              </Link>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

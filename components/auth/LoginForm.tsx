@@ -22,6 +22,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import { useToast } from "../ui/use-toast";
 
 const formSchema = z.object({
   email: z
@@ -39,17 +40,29 @@ const formSchema = z.object({
 
 const LoginForm = () => {
   const router = useRouter();
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
-      password: "",
+      email: "getit.admin@gmail.com",
+      password: "@123Admin",
     },
   });
 
-  const handleSubmit = (data: z.infer<typeof formSchema>) => {
-    router.push("/");
+  const handleSubmit = async (data: z.infer<typeof formSchema>) => {
+    const formData = new FormData();
+    formData.append("email", data.email);
+    formData.append("password", data.password);
+
+    const response = await loginAction(formData);
+
+    if (response && !response.success && response.message) {
+      toast({
+        description: response.message,
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -63,8 +76,8 @@ const LoginForm = () => {
       <CardContent className="space-y-2">
         <Form {...form}>
           <form
-            // onSubmit={form.handleSubmit(handleSubmit)}
-            action={loginAction}
+            onSubmit={form.handleSubmit(handleSubmit)}
+            // action={loginAction}
             className="space-y-6"
           >
             <FormField
