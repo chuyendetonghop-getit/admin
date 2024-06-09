@@ -12,6 +12,11 @@ export type TLocationPost = {
   displayName: string;
 };
 
+export type TGeoLocation = {
+  location: TLocationPost;
+  radius: number;
+};
+
 export type TPost = {
   _id: string;
   userId: string;

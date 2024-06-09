@@ -11,6 +11,8 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import connectDB from "./db";
 import { formatDataForRecharts } from "./utils";
+import mongoose, { mongo } from "mongoose";
+import MessageModel from "@/models/message.model";
 
 // 1. Auth actions
 export async function loginAction(data: FormData) {
@@ -201,6 +203,117 @@ export async function getDashboardAnalytics() {
 
 // 4. User actions
 
+export async function getUsers({
+  limit = 10,
+  skip = 1,
+  search,
+}: {
+  limit?: number;
+  skip?: number;
+  search?: string;
+}) {
+  try {
+    await connectDB();
+
+    let query = {
+      role: "user",
+    };
+
+    if (search) {
+      query = {
+        ...query,
+        // @ts-ignore
+        $or: [
+          { name: { $regex: search, $options: "i" } },
+          { email: { $regex: search, $options: "i" } },
+          { phone: { $regex: search, $options: "i" } },
+        ],
+      };
+    }
+
+    const users = await UserModel.find(query, {})
+      .sort({ createdAt: -1 })
+      .skip((skip - 1) * limit ?? 0)
+      .limit(limit ?? 10)
+      .lean();
+
+    // console.log("Users", users);
+    const userCount = await UserModel.countDocuments(query);
+
+    return {
+      success: true,
+      data: { users, total: userCount },
+    };
+  } catch (error: any) {
+    console.log("Error in getUsers", error);
+    return {
+      success: false,
+      message: error ?? error.message,
+    };
+  }
+}
+
+export async function deleteUser(userId: string) {
+  try {
+    await connectDB();
+
+    const user = await UserModel.exists({
+      _id: userId,
+    });
+
+    if (!user) {
+      return {
+        success: false,
+        message: "User not found",
+      };
+    }
+
+    // If user found, delete it and related data conversations, reports
+
+    // 1. Delete user
+    await UserModel.findOneAndDelete({
+      _id: new mongoose.Types.ObjectId(userId),
+    });
+    // 2. Delete posts
+    await PostModel.deleteMany({ _id: new mongoose.Types.ObjectId(userId) });
+    // 3. Delete conversations
+    const conversations = await ConversationModel.find({
+      // user in participants
+      participants: {
+        $in: [new mongoose.Types.ObjectId(userId)],
+      },
+    });
+    // 4. Delete messages in conversations
+    for (let conversation of conversations) {
+      await ConversationModel.findOneAndDelete({
+        _id: conversation._id,
+      });
+
+      // Delete messages
+      await MessageModel.deleteMany({
+        conversationId: conversation._id,
+      });
+    }
+
+    // 5. Delete reports
+    await ReportModel.deleteMany({
+      // user match reporterId
+      reporterId: userId,
+    });
+
+    return {
+      success: true,
+      message: "User deleted successfully",
+    };
+  } catch (error: any) {
+    console.log("Error in deleteUser", error);
+    return {
+      success: false,
+      message: error ?? error.message,
+    };
+  }
+}
+
 // 5. Post actions
 
 // get posts from db with limit, skip, search
@@ -223,7 +336,7 @@ export async function getPosts({
       : {};
 
     const posts = await PostModel.find(query)
-      .sort({ createdAt: 1 })
+      .sort({ createdAt: -1 })
       .skip((skip - 1) * limit ?? 0)
       .limit(limit ?? 10)
       .lean();

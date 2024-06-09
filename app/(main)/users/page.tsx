@@ -1,7 +1,11 @@
-import React from "react";
+import UserTable from "@/components/users/UserTable";
 
 function UsersPage() {
-  return <div>UsersPage</div>;
+  return (
+    <>
+      <UserTable />
+    </>
+  );
 }
 
 export default UsersPage;
