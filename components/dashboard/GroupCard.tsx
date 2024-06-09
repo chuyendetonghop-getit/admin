@@ -8,7 +8,7 @@ async function GroupCard() {
 
   console.log("->>", result);
   return (
-    <div className="flex flex-col md:flex-row justify-between gap-5 mb-5">
+    <div className="flex flex-col md:flex-row justify-evenly gap-5 mb-5">
       <DashboardCardItem
         title="Users"
         count={result?.data?.[0] ?? 111}
