@@ -395,3 +395,76 @@ export async function deletePost(postId: string) {
 }
 
 // 6. Report actions
+
+export async function getReports({
+  limit = 10,
+  skip = 1,
+  search,
+}: {
+  limit?: number;
+  skip?: number;
+  search?: string;
+}) {
+  try {
+    await connectDB();
+
+    const query = search
+      ? {
+          title: { $regex: search, $options: "i" },
+        }
+      : {};
+
+    const reports = await ReportModel.find(query)
+      .populate("postId")
+      .populate("reporterId")
+      .sort({ createdAt: -1 })
+      .skip((skip - 1) * limit ?? 0)
+      .limit(limit ?? 10)
+      .lean();
+
+    // console.log("Reports", reports);
+    const reportCount = await ReportModel.countDocuments(query);
+
+    return {
+      success: true,
+      data: { reports, total: reportCount },
+    };
+  } catch (error: any) {
+    console.log("Error in getReports", error);
+    return {
+      success: false,
+      message: error ?? error.message,
+    };
+  }
+}
+
+export async function deleteReport(reportId: string) {
+  try {
+    await connectDB();
+
+    const report = await ReportModel.exists({
+      _id: reportId,
+    });
+
+    if (!report) {
+      return {
+        success: false,
+        message: "Report not found",
+      };
+    }
+
+    // If report found, delete it
+    await ReportModel.findOneAndDelete({ _id: reportId });
+
+    return {
+      success: true,
+      message: "Report deleted successfully",
+    };
+  } catch (error: any) {
+    console.log("Error in deleteReport", error);
+    return {
+      success: false,
+      message: error ?? error.message,
+    };
+  }
+}

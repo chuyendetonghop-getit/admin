@@ -1,7 +1,12 @@
+import ReportTable from "@/components/reports/ReportTable";
 import React from "react";
 
 function ReportsPage() {
-  return <div>ReportsPage</div>;
+  return (
+    <>
+      <ReportTable />
+    </>
+  );
 }
 
 export default ReportsPage;
