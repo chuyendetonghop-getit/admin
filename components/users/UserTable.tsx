@@ -122,7 +122,7 @@ const UserTable = () => {
                   <TableCell>
                     <div className="flex gap-1 justify-center items-center">
                       <UserDialog {...user} />
-                      <UserDeleteBtn {...user} setRefetch={setRefetch} />
+                      {/* <UserDeleteBtn {...user} setRefetch={setRefetch} /> */}
                     </div>
                   </TableCell>
                 </TableRow>
