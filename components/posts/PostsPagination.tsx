@@ -38,10 +38,11 @@ const PostsPagination = ({
   const handlePageChange = (page: number, type: "up" | "down") => {
     if (type === "up" && hasNextPage) {
       onPageChange(currentPage + 1);
+      setRefetch((prev) => !prev);
     } else if (type === "down" && hasPreviousPage) {
       onPageChange(currentPage - 1);
+      setRefetch((prev) => !prev);
     }
-    setRefetch((prev) => !prev);
   };
   return (
     <div className="relative">
@@ -52,7 +53,6 @@ const PostsPagination = ({
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious
-              href="#"
               className={renderHasPreviousClass}
               onClick={() => {
                 handlePageChange(currentPage, "down");
@@ -62,7 +62,6 @@ const PostsPagination = ({
 
           <PaginationItem>
             <PaginationLink
-              href="#"
               className={renderHasPreviousClass}
               onClick={() => {
                 handlePageChange(currentPage, "down");
@@ -73,14 +72,13 @@ const PostsPagination = ({
           </PaginationItem>
 
           <PaginationItem>
-            <PaginationLink href="#" className="bg-blue-500 text-white">
+            <PaginationLink className="bg-blue-500 text-white">
               {currentPage}
             </PaginationLink>
           </PaginationItem>
 
           <PaginationItem>
             <PaginationLink
-              href="#"
               className={renderHasNextClass}
               onClick={() => {
                 handlePageChange(currentPage, "up");
@@ -92,7 +90,6 @@ const PostsPagination = ({
           <PaginationItem></PaginationItem>
           <PaginationItem>
             <PaginationNext
-              href="#"
               className={renderHasNextClass}
               onClick={() => {
                 handlePageChange(currentPage, "up");
