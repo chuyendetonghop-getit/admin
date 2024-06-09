@@ -39,39 +39,39 @@ function PostDialog(post: PostDialogProps) {
       <DialogContent className="sm:max-w-[700px]">
         <DialogHeader>
           <DialogTitle>{post.title}</DialogTitle>
-          {/* <DialogDescription>
-            {post.description.slice(0, 100)}
-          </DialogDescription> */}
         </DialogHeader>
 
         <div className="flex flex-col">
           <div className="content-top flex gap-4">
-            <div className="images px-8">
-              <Carousel>
-                <CarouselContent className="ctn">
-                  {post.images.map((image, index) => (
-                    <CarouselItem>
-                      <Image
-                        src={image}
-                        width={180}
-                        height={180}
-                        alt={post.title}
-                        className="w-full h-full object-contain rounded-md"
-                      />
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-                <CarouselPrevious />
-                <CarouselNext />
-              </Carousel>
-            </div>
-            {/* <Image
-              src={post.images[0]}
-              width={180}
-              height={180}
-              alt={post.title}
-              className="w-45 h-45 object-cover rounded-md"
-            /> */}
+            {post.images.length > 1 ? (
+              <div className="images px-8">
+                <Carousel>
+                  <CarouselContent className="ctn">
+                    {post.images.map((image, index) => (
+                      <CarouselItem>
+                        <Image
+                          src={image}
+                          width={180}
+                          height={180}
+                          alt={post.title}
+                          className="w-full h-full object-contain rounded-md"
+                        />
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <CarouselPrevious />
+                  <CarouselNext />
+                </Carousel>
+              </div>
+            ) : (
+              <Image
+                src={post.images[0]}
+                width={180}
+                height={180}
+                alt={post.title}
+                className="w-45 h-45 object-cover rounded-md"
+              />
+            )}
             <div className="ml-4">
               <div className="flex justify-start items-center gap-4">
                 <Label className="font-bold text-sm">Post ID: </Label>
