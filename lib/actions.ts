@@ -1,17 +1,16 @@
 "use server";
 
+import ConversationModel from "@/models/conversation.model";
+import PostModel from "@/models/post.model";
+import ReportModel from "@/models/report.model";
 import UserModel, { UserDocument } from "@/models/user.model";
 import bcrypt from "bcrypt";
+import { SignJWT } from "jose";
+import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import connectDB from "./db";
-import { SignJWT } from "jose";
-import { revalidatePath } from "next/cache";
-import PostModel from "@/models/post.model";
-import ReportModel from "@/models/report.model";
-import exp from "constants";
 import { formatDataForRecharts } from "./utils";
-import { TModelAggregateResponse } from "@/types/analytics";
 
 // 1. Auth actions
 export async function loginAction(data: FormData) {
@@ -237,6 +236,43 @@ export async function getPosts({
     };
   } catch (error: any) {
     console.log("Error in getPosts", error);
+    return {
+      success: false,
+      message: error ?? error.message,
+    };
+  }
+}
+
+export async function deletePost(postId: string) {
+  try {
+    await connectDB();
+
+    const post = await PostModel.exists({
+      _id: postId,
+    });
+
+    if (!post) {
+      return {
+        success: false,
+        message: "Post not found",
+      };
+    }
+
+    // If post found, delete it and related data conversations, reports
+
+    // 1. Delete post
+    await PostModel.findOneAndDelete({ _id: postId });
+    // 2. Delete conversations
+    await ConversationModel.deleteMany({ postId });
+    // 3. Delete reports
+    await ReportModel.deleteMany({ postId });
+
+    return {
+      success: true,
+      message: "Post deleted successfully",
+    };
+  } catch (error: any) {
+    console.log("Error in deletePost", error);
     return {
       success: false,
       message: error ?? error.message,

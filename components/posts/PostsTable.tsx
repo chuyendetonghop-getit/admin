@@ -7,20 +7,16 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  TableCaption,
 } from "@/components/ui/table";
-import Link from "next/link";
-import posts from "@/data/posts";
-import { Post } from "@/types/posts";
-import { Eye, Trash2 } from "lucide-react";
-import { Input } from "../ui/input";
-import { useEffect, useState } from "react";
-import { Button } from "../ui/button";
 import { getPosts } from "@/lib/actions";
 import { TPost } from "@/types/post.type";
 import moment from "moment";
-import CurrencyFormat from "react-currency-format";
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import CurrencyFormat from "react-currency-format";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import PostDeleteBtn from "./PostDeleteBtn";
 import PostDialog from "./PostDialog";
 
 interface PostsTableProps {
@@ -33,22 +29,16 @@ const PostsTable = ({ limit, title }: PostsTableProps) => {
   const [page, setPage] = useState(1);
   const [postData, setPostData] = useState<TPost[]>();
 
-  // Sort posts in dec order based on date
-  const sortedPosts: Post[] = [...posts].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  );
-
-  // Filter posts to limit
-  const filteredPosts = limit ? sortedPosts.slice(0, limit) : sortedPosts;
+  const [refetch, setRefetch] = useState(false);
 
   useEffect(() => {
     (async () => {
       const res = await getPosts({ skip: page, limit: 10, search });
       const data = JSON.parse(JSON.stringify(res?.data));
-      console.log("Data----->", data);
+      // console.log("Data----->", data);
       setPostData(data as any);
     })();
-  }, []);
+  }, [refetch]);
 
   return (
     <div className="max-h-[calc(100%-40px)] overflow-auto mb-2 mt-2">
@@ -77,7 +67,7 @@ const PostsTable = ({ limit, title }: PostsTableProps) => {
             <TableHead>Price</TableHead>
             <TableHead>Category</TableHead>
             <TableHead className="hidden md:table-cell text-center">
-              Author ID
+              Location
             </TableHead>
             <TableHead className="hidden md:table-cell text-center">
               Date
@@ -118,7 +108,7 @@ const PostsTable = ({ limit, title }: PostsTableProps) => {
                   {post.category?.cat_name}
                 </TableCell>
                 <TableCell className="hidden md:table-cell">
-                  {post.userId}
+                  {post.location?.displayName}
                 </TableCell>
                 <TableCell className="text-center hidden md:table-cell">
                   {moment(post.createdAt).format("MMMM Do YYYY, h:mm:ss a")}
@@ -129,9 +119,7 @@ const PostsTable = ({ limit, title }: PostsTableProps) => {
                       <Eye />
                     </button> */}
                     <PostDialog {...post} />
-                    <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded text-xs">
-                      <Trash2 />
-                    </button>
+                    <PostDeleteBtn {...post} setRefetch={setRefetch} />
                   </div>
                 </TableCell>
               </TableRow>
