@@ -1,37 +1,107 @@
+"use client";
+
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from '@/components/ui/pagination';
+} from "@/components/ui/pagination";
+import { Dispatch, SetStateAction } from "react";
 
-const PostsPagination = () => {
+type PostsPaginationProps = {
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
+  currentPage: number;
+  onPageChange: (page: number) => void;
+  setRefetch: Dispatch<SetStateAction<boolean>>;
+  total: number;
+};
+
+const PostsPagination = ({
+  hasPreviousPage,
+  hasNextPage,
+  currentPage,
+  onPageChange,
+  setRefetch,
+  total,
+}: PostsPaginationProps) => {
+  const renderHasPreviousClass = hasPreviousPage
+    ? "cursor-pointer opacity-100"
+    : "cursor-not-allowed opacity-50";
+
+  const renderHasNextClass = hasNextPage
+    ? "cursor-pointer opacity-100"
+    : "cursor-not-allowed opacity-50";
+
+  const handlePageChange = (page: number, type: "up" | "down") => {
+    if (type === "up" && hasNextPage) {
+      onPageChange(currentPage + 1);
+    } else if (type === "down" && hasPreviousPage) {
+      onPageChange(currentPage - 1);
+    }
+    setRefetch((prev) => !prev);
+  };
   return (
-    <Pagination>
-      <PaginationContent>
-        <PaginationItem>
-          <PaginationPrevious href='#' />
-        </PaginationItem>
-        <PaginationItem>
-          <PaginationLink href='#'>1</PaginationLink>
-        </PaginationItem>
-        <PaginationItem>
-          <PaginationLink href='#'>2</PaginationLink>
-        </PaginationItem>
-        <PaginationItem>
-          <PaginationLink href='#'>3</PaginationLink>
-        </PaginationItem>
-        <PaginationItem>
-          <PaginationEllipsis />
-        </PaginationItem>
-        <PaginationItem>
-          <PaginationNext href='#' />
-        </PaginationItem>
-      </PaginationContent>
-    </Pagination>
+    <div className="relative">
+      <div className="absolute left-0 translate-y-[50%] text-sm text-gray-500">
+        Total: {total} documents
+      </div>
+      <Pagination>
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious
+              href="#"
+              className={renderHasPreviousClass}
+              onClick={() => {
+                handlePageChange(currentPage, "down");
+              }}
+            />
+          </PaginationItem>
+
+          <PaginationItem>
+            <PaginationLink
+              href="#"
+              className={renderHasPreviousClass}
+              onClick={() => {
+                handlePageChange(currentPage, "down");
+              }}
+            >
+              {currentPage - 1}
+            </PaginationLink>
+          </PaginationItem>
+
+          <PaginationItem>
+            <PaginationLink href="#" className="bg-blue-500 text-white">
+              {currentPage}
+            </PaginationLink>
+          </PaginationItem>
+
+          <PaginationItem>
+            <PaginationLink
+              href="#"
+              className={renderHasNextClass}
+              onClick={() => {
+                handlePageChange(currentPage, "up");
+              }}
+            >
+              {currentPage + 1}
+            </PaginationLink>
+          </PaginationItem>
+          <PaginationItem></PaginationItem>
+          <PaginationItem>
+            <PaginationNext
+              href="#"
+              className={renderHasNextClass}
+              onClick={() => {
+                handlePageChange(currentPage, "up");
+              }}
+            />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
+    </div>
   );
 };
 

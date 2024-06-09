@@ -12,12 +12,13 @@ import { getPosts } from "@/lib/actions";
 import { TPost } from "@/types/post.type";
 import moment from "moment";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import CurrencyFormat from "react-currency-format";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import PostDeleteBtn from "./PostDeleteBtn";
 import PostDialog from "./PostDialog";
+import PostsPagination from "./PostsPagination";
 
 interface PostsTableProps {
   limit?: number;
@@ -27,25 +28,34 @@ interface PostsTableProps {
 const PostsTable = ({ limit, title }: PostsTableProps) => {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [hasPreviousPage, setHasPreviousPage] = useState(false);
+  const [hasNextPage, setHasNextPage] = useState(false);
   const [postData, setPostData] = useState<TPost[]>();
 
   const [refetch, setRefetch] = useState(false);
+
+  const total = useRef(0);
 
   useEffect(() => {
     (async () => {
       const res = await getPosts({ skip: page, limit: 10, search });
       const data = JSON.parse(JSON.stringify(res?.data));
       // console.log("Data----->", data);
-      setPostData(data as any);
+      setPostData(data?.posts as any);
+
+      const totalPage = Math.ceil(data?.total / 10);
+      total.current = data?.total;
+      setHasPreviousPage(page > 1);
+      setHasNextPage(page < totalPage);
     })();
   }, [refetch]);
 
   return (
-    <div className="max-h-[calc(100%-40px)] overflow-auto mb-2 mt-2">
+    <div className="max-h-[calc(100%-40px)] overflow-auto mt-2">
       <div className="flex w-full max-w-sm items-center space-x-2">
         <Input
-          type="email"
-          placeholder="Email"
+          type="text"
+          placeholder="Enter title to search..."
           className="focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -53,13 +63,16 @@ const PostsTable = ({ limit, title }: PostsTableProps) => {
         <Button
           onClick={() => {
             console.log("Search for", search);
+            // reset page to 1
+            setPage(1);
+            setRefetch((prev) => !prev);
           }}
         >
           Search
         </Button>
       </div>
 
-      <Table className="mt-2">
+      <Table className="mt-2 mb-2">
         <TableHeader>
           <TableRow>
             <TableHead> </TableHead>
@@ -126,6 +139,16 @@ const PostsTable = ({ limit, title }: PostsTableProps) => {
             ))}
         </TableBody>
       </Table>
+
+      {/* pagination */}
+      <PostsPagination
+        hasPreviousPage={hasPreviousPage}
+        hasNextPage={hasNextPage}
+        currentPage={page}
+        onPageChange={setPage}
+        setRefetch={setRefetch}
+        total={total.current}
+      />
     </div>
   );
 };

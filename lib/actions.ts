@@ -229,10 +229,11 @@ export async function getPosts({
       .lean();
 
     // console.log("Posts", posts);
+    const postCount = await PostModel.countDocuments(query);
 
     return {
       success: true,
-      data: posts,
+      data: { posts, total: postCount },
     };
   } catch (error: any) {
     console.log("Error in getPosts", error);
