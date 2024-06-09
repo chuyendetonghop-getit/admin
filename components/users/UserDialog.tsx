@@ -56,7 +56,7 @@ function UserDialog(user: UserDialogProps) {
                 <p>{user?.verify ? "Yes" : "No"}</p>
               </div>
               <div className="flex justify-start items-center gap-4">
-                <Label className="font-bold text-sm">Status: </Label>
+                <Label className="font-bold text-sm">Email: </Label>
                 <p>{user?.email ? user?.email : "N/A"}</p>
               </div>
               <div className="flex justify-start items-center gap-4">
