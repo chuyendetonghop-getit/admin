@@ -1,4 +1,5 @@
 import { category, statusPost } from "@/lib/utils";
+import { TUser } from "./user.type";
 
 export type TCategoryItem = (typeof category)[number];
 
@@ -19,7 +20,7 @@ export type TGeoLocation = {
 
 export type TPost = {
   _id: string;
-  userId: string;
+  userId: TUser;
   location: TLocationPost;
   category: TCategoryItem;
   images: string[];

@@ -336,6 +336,7 @@ export async function getPosts({
       : {};
 
     const posts = await PostModel.find(query)
+      .populate("userId")
       .sort({ createdAt: -1 })
       .skip((skip - 1) * limit ?? 0)
       .limit(limit ?? 10)

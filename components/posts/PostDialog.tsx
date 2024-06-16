@@ -78,8 +78,8 @@ function PostDialog(post: PostDialogProps) {
                 <p>{post._id}</p>
               </div>
               <div className="flex justify-start items-center gap-4">
-                <Label className="font-bold text-sm">Author ID: </Label>
-                <p>{post.userId}</p>
+                <Label className="font-bold text-sm">Author: </Label>
+                <p>{post?.userId?.name}</p>
               </div>
               <div className="flex justify-start items-center gap-4">
                 <Label className="font-bold text-sm">Price: </Label>

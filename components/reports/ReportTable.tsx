@@ -25,13 +25,9 @@ const ReportTable = () => {
   const [hasPreviousPage, setHasPreviousPage] = useState(false);
   const [hasNextPage, setHasNextPage] = useState(false);
   const [reportData, setReportData] = useState<TReport[]>();
-
   const [isLoad, setIsLoad] = useState(false);
-
   const [refetch, setRefetch] = useState(false);
-
   const total = useRef(0);
-
   useEffect(() => {
     (async () => {
       setIsLoad(true);
@@ -54,26 +50,6 @@ const ReportTable = () => {
         <AppSkeleton />
       ) : (
         <div className="max-h-[calc(100%-40px)] overflow-auto mt-2">
-          {/* <div className="flex w-full max-w-sm items-center space-x-2">
-        <Input
-          type="text"
-          placeholder="Enter name, phone or email to search..."
-          className="focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <Button
-          onClick={() => {
-            console.log("Search for", search);
-            // reset page to 1
-            setPage(1);
-            setRefetch((prev) => !prev);
-          }}
-        >
-          Search
-        </Button>
-      </div> */}
-
           <Table className="mt-2 mb-2">
             <TableHeader>
               <TableRow>
@@ -88,7 +64,6 @@ const ReportTable = () => {
                 <TableHead className="text-center">Action</TableHead>
               </TableRow>
             </TableHeader>
-
             <TableBody>
               {reportData &&
                 reportData?.map((report) => {

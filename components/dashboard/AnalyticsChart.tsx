@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card";
 import {
   CartesianGrid,
+  Label,
   Legend,
   Line,
   LineChart,
@@ -23,11 +24,9 @@ import { useEffect, useState } from "react";
 
 const AnalyticsChart = () => {
   const [data, setData] = useState();
-
   useEffect(() => {
     (async () => {
       const data = await getDashboardAnalytics();
-
       setData(data as any);
     })();
   }, []);
@@ -41,29 +40,47 @@ const AnalyticsChart = () => {
         <CardContent>
           <div style={{ width: "100%", height: 300 }}>
             <ResponsiveContainer>
-              <LineChart width={1100} height={300} data={data}>
+              <LineChart
+                width={1100}
+                height={300}
+                data={data}
+                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+              >
                 <Line
+                  yAxisId="left"
                   type="monotone"
                   dataKey="users"
                   stroke="#8884d8"
                   name="User"
                 />
                 <Line
+                  yAxisId="right"
                   type="monotone"
                   dataKey="posts"
                   stroke="#4ad0a6"
                   name="Post"
                 />
-                <Line
-                  type="monotone"
-                  dataKey="reports"
-                  stroke="#f90ccd"
-                  name="Report"
-                />
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="month" />
-                <YAxis />
+                {/* <YAxis /> */}
                 <Tooltip />
+                <YAxis yAxisId="left">
+                  <Label
+                    value="Users"
+                    angle={-90}
+                    position="insideLeft"
+                    style={{ textAnchor: "middle" }}
+                  />
+                </YAxis>
+                <YAxis yAxisId="right" orientation="right">
+                  <Label
+                    value="Posts"
+                    angle={-90}
+                    position="insideRight"
+                    style={{ textAnchor: "middle" }}
+                  />
+                </YAxis>
+
                 <Legend />
               </LineChart>
             </ResponsiveContainer>

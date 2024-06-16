@@ -5,8 +5,6 @@ import { getDashboardCommonStatistics } from "@/lib/actions";
 
 async function GroupCard() {
   const result = await getDashboardCommonStatistics();
-
-  console.log("->>", result);
   return (
     <div className="flex flex-col md:flex-row justify-evenly gap-5 mb-5">
       <DashboardCardItem
@@ -14,7 +12,6 @@ async function GroupCard() {
         count={result?.data?.[0] ?? 111}
         icon={<User className="text-slate-500" size={72} />}
       />
-
       <DashboardCardItem
         title="Posts"
         count={result?.data?.[1] ?? 222}

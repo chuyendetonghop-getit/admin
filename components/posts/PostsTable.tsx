@@ -26,25 +26,20 @@ interface PostsTableProps {
   title?: string;
 }
 
-const PostsTable = ({ limit, title }: PostsTableProps) => {
+const PostsTable = () => {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [hasPreviousPage, setHasPreviousPage] = useState(false);
   const [hasNextPage, setHasNextPage] = useState(false);
   const [postData, setPostData] = useState<TPost[]>();
-
   const [isLoad, setIsLoad] = useState(false);
-
   const [refetch, setRefetch] = useState(false);
-
   const total = useRef(0);
-
   useEffect(() => {
     (async () => {
       setIsLoad(true);
       const res = await getPosts({ skip: page, limit: 10, search });
       const data = JSON.parse(JSON.stringify(res?.data));
-      // console.log("Data----->", data);
       setPostData(data?.posts as any);
 
       const totalPage = Math.ceil(data?.total / 10);
@@ -80,7 +75,6 @@ const PostsTable = ({ limit, title }: PostsTableProps) => {
               Search
             </Button>
           </div>
-
           <Table className="mt-2 mb-2">
             <TableHeader>
               <TableRow>
@@ -97,7 +91,6 @@ const PostsTable = ({ limit, title }: PostsTableProps) => {
                 <TableHead className="text-center">Action</TableHead>
               </TableRow>
             </TableHeader>
-
             <TableBody>
               {postData &&
                 postData?.map((post) => (
