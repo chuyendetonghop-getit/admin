@@ -126,6 +126,7 @@ export async function getDashboardAnalytics() {
     const userAggregation = UserModel.aggregate([
       {
         $match: {
+          role: { $eq: "user" },
           createdAt: {
             $gte: new Date(`${currentYear}-01-01`),
             $lt: new Date(`${currentYear + 1}-01-01`),
