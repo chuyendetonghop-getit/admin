@@ -1,53 +1,122 @@
 # Get IT - Admin Dashboard UI
 
-This is Get IT - Admin Dashboard UI built with Next.js. It is only the front-end interface so we are just using files for the data. Feel free to add on to it and make it a full stack project.
+## Giới thiệu
 
-### Packages Used
+Get IT Admin Dashboard là giao diện quản trị được xây dựng bằng Next.js, được thiết kế để quản lý nền tảng mua bán/rao vặt. Dashboard cung cấp các tính năng quản lý người dùng, bài đăng, báo cáo và phân tích dữ liệu.
 
-- Next.js/React
+## Tính năng chính
+
+- 🔐 Xác thực & Phân quyền
+
+  - Đăng nhập dành cho admin
+  - Bảo vệ route với middleware
+  - JWT authentication
+
+- 👥 Quản lý người dùng
+
+  - Xem danh sách người dùng
+  - Tìm kiếm người dùng
+  - Xóa người dùng và dữ liệu liên quan
+
+- 📝 Quản lý bài đăng
+
+  - Xem danh sách bài đăng
+  - Tìm kiếm bài đăng
+  - Xem chi tiết bài đăng
+  - Xóa bài đăng
+
+- 🚩 Quản lý báo cáo
+
+  - Xem danh sách báo cáo vi phạm
+  - Lọc báo cáo theo loại
+  - Xử lý báo cáo
+
+- 📊 Dashboard & Phân tích
+  - Thống kê tổng quan
+  - Biểu đồ phân tích theo thời gian
+  - Theo dõi hoạt động người dùng
+
+## Tech Stack
+
+### Frontend
+
+- Next.js 14 (App Router)
 - TypeScript
-- Shadcn/ui
 - Tailwind CSS
-- Recharts
-- Lucide React
-- React Hook Form
-- Zod
-- Next Themes
+- Shadcn/ui
+- Lucide React (Icons)
+- Recharts (Charts)
+- React Hook Form + Zod (Form handling)
+- Next Themes (Dark/Light mode)
 
-## Getting Started
+### Backend & Database
 
-1. Install dependencies:
+- MongoDB (Database)
+- Mongoose (ODM)
+- JWT (Authentication)
+- bcrypt (Password hashing)
+
+## Cấu trúc dữ liệu
+
+### User
+
+- Thông tin cơ bản: tên, số điện thoại, mật khẩu
+- Vị trí địa lý (geolocation)
+- Vai trò (role)
+- Trạng thái xác thực
+
+### Post
+
+- Thông tin bài đăng: tiêu đề, mô tả, giá
+- Danh mục
+- Vị trí
+- Hình ảnh
+- Trạng thái bài đăng
+- Thông tin liên hệ
+
+### Report
+
+- Bài đăng được báo cáo
+- Lý do báo cáo
+- Người báo cáo
+
+### Conversation & Message
+
+- Chat giữa người mua và người bán
+- Lịch sử tin nhắn
+- Thông tin bài đăng liên quan
+
+## Cài đặt
+
+1. Clone repository và cài đặt dependencies:
 
 ```bash
-npm install
-
-# or
-
-yarn
+git clone <repository-url>
+cd get-it-admin
+pnpm install
 ```
 
----
-
-2. Create .env.local file with MONGO_URI variable inside:
+2. Tạo file .env.local và thêm các biến môi trường:
 
 ```bash
-echo MONGO_URI=123 .env.local
+MONGO_URI=your_mongodb_uri
+MONGO_DB_NAME=your_db_name
+THE_SECRET=your_jwt_secret
+ACCESS_TOKEN_TTL_NUMBER=4
 ```
 
-Replace "123" with your Mongo URI.
-
----
-
-3. Run the development server:
+3. Khởi chạy development server:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Truy cập [http://localhost:3000](http://localhost:3000) để xem kết quả.
+
+## Đóng góp
+
+Dự án này là một giao diện frontend và có thể được mở rộng thành một ứng dụng fullstack hoàn chỉnh. Mọi đóng góp đều được chào đón!
+
+## License
+
+[MIT License](LICENSE)
